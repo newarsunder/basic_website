@@ -3,117 +3,266 @@
   <head>
     <title>Document</title>
     <style>
+      .main {
+        display: flex;
+        justify-content: space-between;
+      }
       .board {
         position: relative;
         background-image: url("https://thumbs.dreamstime.com/b/snakes-ladders-board-game-boardgame-cartoon-261240493.jpg");
         background-size: contain;
         height: 700px;
         width: 700px;
+        right: 10%;
+        /* margin: auto; */
+      }
+      .controls {
+        height: 600px;
+        width: 300px;
+        border: 1px dashed;
+        top: 10px;
+        left: 10px;
+      }
+      .controls > div {
+        text-align: center;
         margin: auto;
-        display: flex;
-        flex-wrap: wrap;
-        /* flex-direction: ; */
+        width: 200px;
       }
-      #player1 {
-        background-color: coral;
-        border-radius: 35px;
-        position: absolute;
-        top: 17px;
-        left: 17px;
-        height: 35px;
-        width: 35px;
-        /* border: 2px solid red; */
+      .dice {
+        height: 200px;
+        margin: 60px auto;
+        width: 100px;
+        display: grid;
+        grid-template-columns: 50px 50px;
+        grid-template-rows: 60px 60px 60px;
       }
-      #player2 {
-        background-color: lightgreen;
-        border-radius: 35px;
-        position: absolute;
-        top: 17px;
-        left: 17px;
-        height: 35px;
-        width: 35px;
-        /* border: 2px solid red; */
+      .cell {
+        height: 50px;
+        width: 50px;
+        background-color: #222;
+        border-radius: 25px;
       }
       .board div {
-        position: relative;
-        /* border: 2px solid green; */
-        height: 70px;
-        width: 70px;
+        box-shadow: 2px 2px #222;
+      }
+      #btn {
+        font-size: 20px;
+        color: #eee;
+        background-color: red;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
       }
     </style>
   </head>
   <body>
-    <div class="board"></div>
-    <button onclick="run()">click</button>
+    <div class="main">
+      <div class="controls">
+        <div style="height: 400px; width: 300px">
+          <div class="dice"></div>
+        </div>
+        <br />
+        <div>
+          <button id="btn" onclick="dice()">Roll the dice</button>
+        </div>
+        <br />
+        <div>
+          Speed:
+          <input type="range" min="1" max="5" value="3" id="rng" />
+        </div>
+      </div>
+      <div class="board"></div>
+    </div>
     <script>
+      //variables
+
+      var slow = document.getElementById("rng").value;
       var board = document.querySelector(".board");
-      var player1 = document.getElementById("player1");
-      var player2 = document.getElementById("player2");
-      var c = 0;
-      for (var i = 0; i < 10; i++) {
-        for (var j = 0; j < 10; j++) {
-          board.innerHTML += `<div class="cell` + c + `"></div>`;
-          c++;
+      var no_of_players = 2;
+      var players = {
+        player1: ["red", 0, 0, true, false],
+        player2: ["blue", 35, 35, true, false],
+        player3: ["green", 35, 0, true, false],
+        player4: ["yellow", 0, 35, true, false],
+      };
+      var current_players = [];
+      var names = [];
+      var ladders = [
+        [[210, 0], [70, 140], true],
+        [[490, 70], [-140, 210], true],
+        [[490, 210], [70, 70], true],
+        [[70, 280], [70, 140], true],
+        [[630, 280], [-70, 140], true],
+        [[70, 420], [-70, 140], true],
+        [[420, 490], [140, 140], false],
+      ];
+      var snakes = [
+        [[420, 140], [-140, -140], true],
+        [[0, 210], [140, -210], true],
+        [[140, 280], [0, -210], false],
+        [[420, 350], [210, -140], false],
+        [[350, 420], [-70, -140], true],
+        [[560, 560], [-70, -210], false],
+        [[350, 630], [-140, -140], false],
+        [[70, 630], [-70, -350], true],
+      ];
+      //restart function
+      function restart() {
+        no_of_players = prompt("Enter the no. of players(max 4):");
+        if (no_of_players > 4) {
+          no_of_players = 4;
+        } else if (no_of_players <= 1) {
+          no_of_players = 2;
+        } else if (no_of_players == "") {
+          no_of_players = 2;
+        }
+        players = {
+          player1: ["red", 0, 0, true],
+          player2: ["blue", 35, 35, true],
+          player3: ["green", 35, 0, true],
+          player4: ["yellow", 0, 35, true],
+        };
+        // console.
+        start(no_of_players);
+      }
+      //start function
+      function start(c) {
+        board.innerHTML = "";
+        current_players = [];
+
+        var n = 0;
+        for (i in players) {
+          if (n == c) {
+            break;
+          }
+          names.push(i);
+          board.innerHTML += '<div class="' + i + '"></div>';
+          current_players.push(document.querySelector("." + i));
+          current_players[n].style.height = "35px";
+          current_players[n].style.width = "35px";
+          current_players[n].style.backgroundColor = players[i][0];
+          current_players[n].style.position = "absolute";
+          current_players[n].style.left = players[i][1] + "px";
+          current_players[n].style.bottom = players[i][2] + "px";
+          current_players[n].style.borderRadius = "40px";
+          n++;
         }
       }
-      var c = 90;
-      document.querySelector(".cell" + c).innerHTML =
-        '<div id="player1" class="player1"></div><div id="player2" class="player2"></div>';
-      var right = true;
-      var a = 0;
-      document.addEventListener("keydown", (e) => {
-        if (e.key == "d") {
-          a++;
-          document.querySelector(".cell" + c).innerHTML = "";
-          if (a % 10 == 0) {
-            if (right) {
-              c -= 9;
-              right = false;
-            } else {
-              c -= 11;
-              right = true;
+      //move function
+      var x = 0;
+      function move(s, index) {
+        step = 1;
+        if (players[index][3]) {
+          players[index][1] += step * 70;
+        } else {
+          players[index][1] -= step * 70;
+        }
+
+        if (players[index][1] >= 700) {
+          players[index][3] = false;
+          players[index][1] -= 70;
+          players[index][2] += 70;
+        } else if (players[index][1] < 0) {
+          players[index][3] = true;
+          players[index][1] += 70;
+          players[index][2] += 70;
+        }
+        if (players[index][2] >= 700) {
+          players[index][2] = 630;
+          players[index][1] += x * 70;
+          x = s - 1;
+          players[index][3] = false;
+        }
+
+        start(no_of_players);
+        x++;
+        if (x == s) {
+          clearInterval(k);
+          if (
+            players[index][1] >= 0 &&
+            players[index][1] < 70 &&
+            players[index][2] >= 630 &&
+            players[index][2] < 700
+          ) {
+            players[index][3] = true;
+            players[index][2] -= 630;
+            start(no_of_players);
+            alert(index + " won!!!");
+            restart();
+          }
+          for (var i of ladders) {
+            if (
+              players[index][1] >= i[0][0] &&
+              players[index][1] < i[0][0] + 70
+            ) {
+              if (
+                players[index][2] >= i[0][1] &&
+                players[index][2] < i[0][1] + 70
+              ) {
+                players[index][1] += i[1][0];
+                players[index][2] += i[1][1];
+                players[index][3] = i[2];
+                start(no_of_players);
+              }
             }
           }
-          if (right) {
-            c++;
-          } else {
-            c--;
+          for (var i of snakes) {
+            if (
+              players[index][1] >= i[0][0] &&
+              players[index][1] < i[0][0] + 70
+            ) {
+              if (
+                players[index][2] >= i[0][1] &&
+                players[index][2] < i[0][1] + 70
+              ) {
+                players[index][1] += i[1][0];
+                players[index][2] += i[1][1];
+                players[index][3] = i[2];
+                start(no_of_players);
+              }
+            }
           }
-          document.querySelector(".cell" + c).innerHTML =
-            '<div id="player1" class="player1"></div>';
-          if (c == 0) {
-            console.log("you win");
-          }
+          x = 0;
+          document.getElementById("btn").disabled = false;
         }
+      }
+      document.getElementById("rng").addEventListener("change", () => {
+        slow = document.getElementById("rng").value;
       });
-      //   var right = true;
-      function move(step, i = 0) {
-        if (i == step) {
-          return;
+      var a = 0;
+      var k;
+      function dice() {
+        document.getElementById("btn").disabled = true;
+        var steps = Math.floor(Math.random() * 6) + 1;
+        document.querySelector(".dice").innerHTML = "";
+        for (var i = 0; i < steps; i++) {
+          document.querySelector(".dice").innerHTML +=
+            '<div style="background-color:' +
+            players[names[a]][0] +
+            '" class="cell"></div>';
+        }
+        // steps = 26;
+
+        if (players[names[a]][4]) {
+          k = setInterval(move, 600 / slow, steps, names[a]);
+        } else {
+          document.getElementById("btn").disabled = false;
+        }
+        if (steps == 6) {
+          players[names[a]][4] = true;
         }
         a++;
-        document.querySelector(".cell" + c).innerHTML = "";
-        if (a % 10 == 0) {
-          if (right) {
-            c -= 9;
-            right = false;
-          } else {
-            c -= 11;
-            right = true;
-          }
+        if (a == names.length) {
+          a = 0;
         }
-        if (right) {
-          c++;
-        } else {
-          c--;
-        }
-        document.querySelector(".cell" + c).innerHTML =
-          '<div id="player1" class="player1"></div>';
-        setTimeout(move, 1000, step, i + 1);
+        document.getElementById("btn").style.backgroundColor =
+          players[names[a]][0];
       }
-      function run() {
-        move(3);
-      }
+      restart();
+      window.onbeforeunload = function () {
+        return true;
+        // window.stop();
+      };
     </script>
   </body>
 </html>
