@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Document</title>
+    <style>
+      .board {
+        position: relative;
+        background-image: url("https://thumbs.dreamstime.com/b/snakes-ladders-board-game-boardgame-cartoon-261240493.jpg");
+        background-size: contain;
+        height: 700px;
+        width: 700px;
+        margin: auto;
+        display: flex;
+        flex-wrap: wrap;
+        /* flex-direction: ; */
+      }
+      #player1 {
+        background-color: coral;
+        border-radius: 35px;
+        position: absolute;
+        top: 17px;
+        left: 17px;
+        height: 35px;
+        width: 35px;
+        /* border: 2px solid red; */
+      }
+      #player2 {
+        background-color: lightgreen;
+        border-radius: 35px;
+        position: absolute;
+        top: 17px;
+        left: 17px;
+        height: 35px;
+        width: 35px;
+        /* border: 2px solid red; */
+      }
+      .board div {
+        position: relative;
+        /* border: 2px solid green; */
+        height: 70px;
+        width: 70px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="board"></div>
+    <button onclick="run()">click</button>
+    <script>
+      var board = document.querySelector(".board");
+      var player1 = document.getElementById("player1");
+      var player2 = document.getElementById("player2");
+      var c = 0;
+      for (var i = 0; i < 10; i++) {
+        for (var j = 0; j < 10; j++) {
+          board.innerHTML += `<div class="cell` + c + `"></div>`;
+          c++;
+        }
+      }
+      var c = 90;
+      document.querySelector(".cell" + c).innerHTML =
+        '<div id="player1" class="player1"></div><div id="player2" class="player2"></div>';
+      var right = true;
+      var a = 0;
+      document.addEventListener("keydown", (e) => {
+        if (e.key == "d") {
+          a++;
+          document.querySelector(".cell" + c).innerHTML = "";
+          if (a % 10 == 0) {
+            if (right) {
+              c -= 9;
+              right = false;
+            } else {
+              c -= 11;
+              right = true;
+            }
+          }
+          if (right) {
+            c++;
+          } else {
+            c--;
+          }
+          document.querySelector(".cell" + c).innerHTML =
+            '<div id="player1" class="player1"></div>';
+          if (c == 0) {
+            console.log("you win");
+          }
+        }
+      });
+      //   var right = true;
+      function move(step, i = 0) {
+        if (i == step) {
+          return;
+        }
+        a++;
+        document.querySelector(".cell" + c).innerHTML = "";
+        if (a % 10 == 0) {
+          if (right) {
+            c -= 9;
+            right = false;
+          } else {
+            c -= 11;
+            right = true;
+          }
+        }
+        if (right) {
+          c++;
+        } else {
+          c--;
+        }
+        document.querySelector(".cell" + c).innerHTML =
+          '<div id="player1" class="player1"></div>';
+        setTimeout(move, 1000, step, i + 1);
+      }
+      function run() {
+        move(3);
+      }
+    </script>
+  </body>
+</html>
